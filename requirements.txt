@@ -1,0 +1,7 @@
+pandas
+numpy
+readline
+click
+pytest
+parsimonious
+nose
