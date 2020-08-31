@@ -20,6 +20,6 @@ setup(name="databass",
       package_data = { 'databass' : ['databass/data/*'] },
       install_requires = [
         'flask', 'parsimonious', 'pandas', 'numpy',
-        'python-dateutil', 'nose', 'sqlalchemy'
+        'python-dateutil', 'pytest', 'sqlalchemy'
       ],
       keywords= "database engine compiler")

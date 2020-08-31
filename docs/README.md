@@ -17,4 +17,6 @@ The following are steps to setup, complete, and submit your assignments
 5. Once the deadline has passed, the staff's scripts will automatically pull the code from the assignment's branch and run our private test cases.  
 
 
+Each assignment includes a set of basic test cases to help you sanity check your solution.   **Be aware that the tests are woefully incomplete**. Thus, we strongly encourage you that come up with, and write you own test cases to more thoroughly evaluate your own code.    We will assess your solutions using those included in the assignment, alongside a private set of test cases.
+
 

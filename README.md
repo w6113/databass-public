@@ -17,16 +17,18 @@ The system is split into parser, operator definitons and interpretor, optimizer,
 
 ## Getting Started
 
-Installation using Python3
+Installation using Python 3
 
     git clone git@github.com:w6113/databass-public.git
 
-    # turn on virtualenv
+    # key whatever command you need to turn on virtualenv
 
+    # install the needed python packages
     pip -r requirements.txt
 
 
-For quick hacks and seeing how databass compiles different query plans, I use the scaffold in test.py:
+The repo includes incomplete test cases that you can run using `pytest`.
+For quick hacks, and to see how databass compiles different query plans, I use the scaffold in test.py:
 
     python test.py
 
@@ -34,15 +36,17 @@ For quick hacks and seeing how databass compiles different query plans, I use th
 
 ### Using the databass API
 
-The following is an example program:
+The following is an example program.  This specific program compiles and runs
+a simple group-by query, but will not correcty run until you have completed
+assignment 3.
 
     from databass import *
     db = Database()
-    q = CompiledQuery("SELECT a, count(1) FROM data GROUP BY a")
+    q = PyCompiledQuery("SELECT a, count(1) FROM data GROUP BY a")
 
     print(q.print_code())
     for row in q(db):
-      print row
+      print(row)
 
 
 ### Using the Prompt
@@ -141,23 +145,40 @@ To compile a query, prefix the query with `COMPILE` (case insensitive).  It will
 You can run the compiled query by prefixing the query with `COMPILE AND RUN` (case insensitive): 
 
 	> COMPILE AND RUN SELECT 1                                                                  
-	Yield()
-	  Project(1.0 AS attr0)
+	Collect()
+	  Project(1.0 AS a0)
+		DummyScan()
 
-	def compiled_q():
-	  proj_row_0 = ListTuple(Schema([Attr('attr0', 'num', None)]))
-	  tmp_0 = 1.0
-	  proj_row_0.row[:] = [tmp_0]
-	  yield proj_row_0
+	000
+	001 def compiled_q(db=None, lineage=None):
+	002   from databass import UDFRegistry
+	003   from datetime import date, datetime
+	004   if not db:
+	005     db = Database()
+	006
+	007   collect_buf_0 = []
+	008
+	009   # --- Pipeline 1 ---
+	010   proj_row_0 = ListTuple(Schema([Attr('a0', 'num', None)]))
+	011   proj_row_0.row[:] = [1.0]
+	012   collect_tmp_0 = ListTuple(Schema([Attr('a0', 'num', None)]))
+	013   collect_tmp_0.row = list(proj_row_0.row)
+	014   collect_buf_0.append(collect_tmp_0)
+	015
+	016   return collect_buf_0
 
-	wrote compiled query to ./_code.py
+
+	wrote compiled query to ./_code.py.  Type `python _code.py` to run it.
 	Running compiled query
 	(1.0)
-	Compiled query took 0.000032 seconds
+	Compiled query took 0.000151 seconds
+
+	Lineage:
+
 
 ### Run Tests
 
-To run tests, use the `nose` python test framework by specifying which tests in the `test/` directory to run:
+To run tests, use the `pytest` python test framework by specifying which tests in the `test/` directory to run:
 
     pytest test/*.py
 

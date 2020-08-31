@@ -4,4 +4,3 @@ readline
 click
 pytest
 parsimonious
-nose
