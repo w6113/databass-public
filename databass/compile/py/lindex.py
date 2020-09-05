@@ -54,22 +54,30 @@ class PyBw(Bw, PyLidx):
     super(PyBw, self).__init__(*args, **kwargs)
     self.preallocated = False
 
+    # if we preallocate the lineage index, then need to
+    # internally track which array element to set next
+    # when self._append is called
+    self.lindex_idx = None
+
   def initialize(self, size=None):
     """
     @size source cardinality
     """
     self.idx = self.ctx.new_var("l_bw")
     self.preallocated = (size is not None)
+    if self.preallocated:
+      self.lindex_idx = self.ctx.new_var("l_bw_idx")
+      self.ctx.declare(self.lindex_idx, 0)
 
     if self.type == Lindex.ONE:
       # bw is always an array because output id always increments 
-      if size is not None:
+      if self.preallocated:
         self.ctx.add_line("{idx} = [None] * ({size})", idx=self.idx, size=size)
       else:
         self.ctx.add_line("{idx} = []", idx=self.idx)
       return 
 
-    if size is not None:
+    if self.preallocated:
       self.ctx.add_line("{idx} = [[] for i in range({size})]", 
           idx=self.idx, size=size)
     else:
@@ -81,7 +89,8 @@ class PyBw(Bw, PyLidx):
     or not the index has been preallocated, so we can't use the default
     """
     if self.preallocated:
-      self._set("len(%s)-1" % self.idx, val)
+      self._set(self.lindex_idx, val)
+      self.ctx.add_line("%s += 1" % self.lindex_idx)
     else:
       self.ctx.add_line("{idx}.append({val})", 
           idx=self.idx, val=val)
@@ -103,13 +112,13 @@ class PyFw(Fw, PyLidx):
     self.preallocated = (size is not None)
 
     if self.type == Lindex.ONE:
-      if size is not None and not self.prev:
+      if self.preallocated and not self.prev:
         self.ctx.add_line("{idx} = [None] * ({size})", idx=self.idx, size=size)
       else:
         self.ctx.add_line("{idx} = dict()", idx=self.idx)
       return
 
-    if size is not None and not self.prev:
+    if self.preallocated and not self.prev:
       self.ctx.add_line("{idx} = [[] for i in range({size})]",
           idx=self.idx, size=size)
     else:

@@ -39,7 +39,7 @@ class Compiler(object):
   def compile_to_lines(self):
     ret = []
     for lhs, rhs in self.declarations:
-      if rhs:
+      if rhs is not None:
         ret.append("%s = %s" % (lhs, rhs))
       else:
         ret.append(lhs)

@@ -19,4 +19,16 @@ The following are steps to setup, complete, and submit your assignments
 
 Each assignment includes a set of basic test cases to help you sanity check your solution.   **Be aware that the tests are woefully incomplete**. Thus, we strongly encourage you that come up with, and write you own test cases to more thoroughly evaluate your own code.    We will assess your solutions using those included in the assignment, alongside a private set of test cases.
 
+## Submission Overview
 
+Should we follow this protocol instead?
+
+* https://github.com/UCHI-DB/course-info#submitting-your-lab
+
+
+## Assignments
+
+* [A0](./a0): Warmup assignment
+* [A1](./a1): Implement iterator operator logic
+* [A2](./a2): Join optimization
+* [A3](./a3): Query Compilation

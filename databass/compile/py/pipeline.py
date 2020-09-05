@@ -14,6 +14,26 @@ from .lindex import *
 
 class PyPipeline(Pipeline):
 
+  def find_prev_lineage_translator(self):
+    """
+    If the source of the current pipeline is a top or right translator,
+    their bottom/left counterparts connect us to the corresponding pipeline.
+    Search it for translators that capture lineage
+    """
+    if len(self) == 0: return None
+
+    prev_pipeline = None
+    if self[0].is_type(TopTranslator):
+      prev_pipeline = self[0].bottom.pipeline
+    if self[0].is_type(RightTranslator):
+      prev_pipeline = self[0].left.pipeline
+
+    if prev_pipeline:
+      for t in reversed(prev_pipeline):
+        if t.lindexes:
+          return t
+    return None
+
   def prepare_lineage(self, ctx, lineage_policy):
     """
     Walk the pipeline and allocate lineage-based variables and lindexes 
@@ -26,7 +46,13 @@ class PyPipeline(Pipeline):
     ctx.declare("# Lineage structures for pipeline %d" % self.id)
     l_o = None        # variable name for previous translator's output rids
     prev_t = None     # previous translator that generates output rids
-    prev_lineage_translator = None # prev translator that builds a lindex
+
+    # closest descendant translator that captures lineage (may be in a prior pipeline)
+    #
+    # by definition, if there is a previous pipeline, we need to decide
+    # if it contains a translator that is considered the prev_lineage_translator
+    prev_lineage_translator = self.find_prev_lineage_translator()
+
     for i, t in enumerate(self):
       if not lineage_policy.bcapture(t): continue
 
@@ -99,11 +125,12 @@ class PyPipeline(Pipeline):
           lindexes = []
           for l in prev_lineage_translator.propagated_lindexes:
             lindexes.append(lindex + l)
-            print(prev_lineage_translator.op, "+", t.op, ' = ', lindexes[-1].src_t.op, ' -> ', lindexes[-1].dst_t.op)
+            #print(prev_lineage_translator, "+", t, ' = ', lindexes[-1].src_t.op, ' -> ', lindexes[-1].dst_t.op)
           t.lindexes = lindexes
 
         t.l_prev_translator = prev_lineage_translator
         prev_lineage_translator = t
+    return prev_lineage_translator
 
 
   def produce(self, ctx):

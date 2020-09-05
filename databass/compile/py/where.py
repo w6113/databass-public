@@ -13,6 +13,7 @@ class PyFilterTranslator(FilterTranslator, PyTranslator):
       self.parent_translator.consume(ctx)
     with ctx.indent("else:"):
       # TODO: negative provenance here
+      ctx.add_line("# negative prov here")
       ctx.add_line("pass")
 
 

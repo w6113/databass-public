@@ -19,7 +19,8 @@ class From(NaryOp):
     self.predicates = predicates
 
   def to_str(self, ctx):
-    with ctx.indent("From"):
+    name = "From(%s)" % " and ".join(map(str, self.predicates))
+    with ctx.indent(name):
       for c in self.cs:
         c.to_str(ctx)
 

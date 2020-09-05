@@ -7,20 +7,31 @@ class PySinkTranslator(SinkTranslator, PyTranslator):
 
   def initialize_lineage_indexes(self, ctx):
     if self.l_capture:
-      ctx.add_line("# {op}", op=self.op)
-      self.l_o = ctx.new_var("sink_l_o")
-      ctx.declare(self.l_o, -1)
-      for lindex in self.lindexes:
-        lindex.fw.initialize()
-        lindex.bw.initialize()
+      # A5: Fill in this code to initialize the state needod
+      #     to track the record id for each output tuple
+      #     as well as initialize the lineage indexes in self.lindexes
+      # 
+      #     Each Lindex is a data structure to manage the forward (lindex.fw)
+      #     and backward (lindex.bw) pointers that will be captured
+      #
+      #     See databass.compile.lindex for the class definitions
+      #     See databass.compile.py.lindex for the python implementations
+      #    
+      pass
 
 
   def populate_lineage_indexes(self, ctx):
+    """
+    This is called in the root operator's consume stage (see below)
+    Its task is to keep track of the output record id
+    and attach the appropriate relationships between the output rid
+    and input rid (or rids)
+    """
     if self.l_capture:
-      ctx.add_line("{l_o} += 1", l_o=self.l_o)
-      for lindex in self.lindexes:
-        lindex.fw.set_1(self.l_i, self.l_o)
-        lindex.bw.append_1(self.l_i)
+      # A5: Fill in this code to populate each of the lindexes
+      #     You can assume that self.l_i contains the current input rid
+      #     and that SinkTranslators are always 1-to-1
+      pass
 
 
 class PyYieldTranslator(YieldTranslator, PySinkTranslator):

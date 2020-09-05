@@ -128,10 +128,6 @@ class Lidx(object):
 
 class IdentityLidx(Lidx):
   def __init__(self, ctx):
-    """
-    @idx  compiled lindex variable name. result of ctx.new_var(...)
-    @prev the previous Lindex object
-    """
     self.ctx = ctx
     self.type = Lindex.ONE
   
@@ -162,7 +158,7 @@ class Bw(Lidx):
         bw idx 1       bw idx 2
     A --> OP1 ---- I --> OP2 ---> O
 
-  Will ensure that bw idx 2 will map output record ids 
+  Bw will ensure that bw idx 2 will map output record ids 
   to record ids in A instead of I
 
   """
@@ -180,28 +176,33 @@ class Bw(Lidx):
   # a previous lindex to propagate
   #
 
-  def append_1(self, val, basecase=False):
-    if basecase or not self.prev:
-      self._append(val)
+  def append_1(self, iid):
+    """
+    @iid single output rid or list of output rids
+
+    Lindex is a list
+    Just append @iid 
+    """
+    if not self.prev:
+      self._append(iid)
       return
 
     if self.prev.bw_n == Lindex.ONE:
-      self._append(self.prev.bw[val])
+      self._append(self.prev.bw[iid])
     else:
-      self._append(self.prev.bw[val])
+      self._append(self.prev.bw[iid])
 
-  def append_n(self, vals, basecase=False):
-    if basecase or not self.prev:
-      self._append(vals)
+  def set_n(self, oid, iids):
+    if not self.prev:
+      self._set(oid, iids)
       return
 
     _iid = self.ctx.new_var("l_bw_iid")
-    with self._loop(vals, _iid):
-      _prev_iid = self.prev.bw[_iid]
+    with self._loop(iids, _iid):
       if self.prev.bw_n == Lindex.ONE:
-        self._append(_prev_iid)
+        self._add_1(oid, self.prev.bw[_iid])
       else:
-        self._append(_prev_iid)
+        self._add_n(oid, self.prev.bw[_iid])
 
 
 
@@ -237,47 +238,48 @@ class Fw(Lidx):
   #
 
 
-  def set_1(self, key, val, basecase=False):
-    if basecase or not self.prev:
-      self._set(key, val)
+  def set_1(self, iid, oid):
+    """
+    This is called when we want to set the @iid'th element 
+    of the lindex to @oid
+    """
+    if not self.prev:
+      self._set(iid, oid)
       return
 
     if self.prev.bw_n == Lindex.ONE:
       if self.prev.fw_n == Lindex.ONE:
-        self._set(self.prev.bw[key], val)
+        self._set(self.prev.bw[iid], oid)
       else:
-        self._add_1(self.prev.bw[key], val)
+        # this means the previous node is 1 -> N, 
+        # and this lindex is a 2D array.
+        # lookup the previous iid and append oid 
+        self._add_1(self.prev.bw[iid], oid)
     else:
+      # previous node is N->1 or N-N,
+      # so we need to loop over prev.bw[iid]
       _iid = self.ctx.new_var("l_fw_iid")
-      with self._loop(self.prev.bw[key], _iid):
+      with self._loop(self.prev.bw[iid], _iid):
         if self.prev.fw_n == Lindex.ONE:
-          self._set(_iid, val)
+          self._set(_iid, oid)
         else:
-          self._add_1(_iid, val)
+          self._add_1(_iid, oid)
 
-  def add_1(self, key, val, basecase=False):
-    if basecase or not self.prev:
-      self._add_1(key, val)
+  def add_1(self, iid, oid):
+    """
+    This is called when the lindex is a 2D array and we want
+    to append a new @oid (output rid) for @iid (input rid)
+    lindex[iid]
+    """
+    if not self.prev:
+      self._add_1(iid, oid)
       return
 
     if self.prev.bw_n == Lindex.ONE:
-      self._add_1(self.prev.bw[key], val)
+      self._add_1(self.prev.bw[iid], oid)
       return
 
     _iid = self.ctx.new_var("l_fw_iid")
-    with self._loop(self.prev.bw[key], _iid):
-      self._add_1(_iid, val)
-
-  def add_n(self, key, vals, basecase=False):
-    if basecase or not self.prev:
-      self._add_n(vals, key)
-      return
-
-    if self.prev.bw_n == Lindex.ONE:
-      self._add_n(self.prev.bw[key], vals)
-      return
-
-    _iid = self.ctx.new_var("l_fw_iid")
-    with self._loop(self.prev.bw[key], _iid):
-      self._add_n(_iid, vals)
+    with self._loop(self.prev.bw[iid], _iid):
+      self._add_1(_iid, oid)
 

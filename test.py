@@ -89,6 +89,8 @@ except:
 plan = Yield(opt(parse("SELECT a, a+b FROM data").to_plan()))
 q = PyCompiledQuery(plan, None)
 print(q.print_code())
+for row in q():
+  print(row)
 
 
 

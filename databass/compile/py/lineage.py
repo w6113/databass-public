@@ -68,6 +68,9 @@ class Lineage(object):
     else:
       raise Exception("direction %s should be 'fw' or 'bw'" % direction)
 
+    #print(self.id2op[srcid], srcid, "->", self.id2op[dstid], dstid, direction, typ)
+    #print(idx)
+
   def find_bw_path(self, start, end):
     """
     Returns the sequence of backward lineage indexes that connects 
@@ -81,7 +84,6 @@ class Lineage(object):
 
     neighbors = self.bws[start]
     if end in neighbors:
-      print(self.id2op[start])
       return [neighbors[end]]
 
     for neighbor in neighbors:
@@ -103,14 +105,22 @@ class Lineage(object):
       # skip non-pipeline breakers
       while child and child.id not in self.bws:
         if not child.is_type(UnaryOp):
+          break
           return None
+
+        # if end was an operator that does not materialize
+        # lineage, then it has the same lineage as neighbors[neighbor]
+        if child.id == end[0]:
+          return [neighbors[neighbor]]
+
+        if not child.children(): break
         child = child.children()[0]
+
       if not child: 
         return None
 
       rest = self.find_bw_path(child.id, end)
       if rest:
-        print(op)
         return [neighbors[neighbor]] + rest
     return None
 
@@ -169,7 +179,6 @@ class Lineage(object):
 
     neighbors = self.fws[start]
     if end in neighbors:
-      #print self.id2op[end]
       return [neighbors[end]]
     
     for neighbor in neighbors:
