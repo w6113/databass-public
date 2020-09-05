@@ -21,9 +21,12 @@ Each assignment includes a set of basic test cases to help you sanity check your
 
 ## Submission Overview
 
-Should we follow this protocol instead?
+Need to decide on how to submit if the above procedure is hard to automate
 
-* https://github.com/UCHI-DB/course-info#submitting-your-lab
+* Use this pytest autograder?
+  * https://github.com/ucsb-gradescope-tools/sample-python-pytest-autograder
+  * https://github.com/ucsb-gradescope-tools/pytest_utils
+* Follow Chicago's protocol? https://github.com/UCHI-DB/course-info#submitting-your-lab
 
 
 ## Assignments
