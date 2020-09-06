@@ -13,6 +13,7 @@ from databass.exprutil import *
 # Optimizer is needed to process a query plan before it can run
 opt = Optimizer()
 
+
 def optimize_and_run(plan):
   plan = opt(plan)
   print(plan.pretty_print())

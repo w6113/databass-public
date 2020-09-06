@@ -23,6 +23,7 @@ class PyOrderByBottomTranslator(OrderByBottomTranslator, PyTranslator):
         "return OBTuple(({v_all},), {order})"
         ], v_all=", ".join(v_all), order=v_ordersort)
 
+
     ctx.request_vars(dict(row=None))
     self.child_translator.produce(ctx)
 
@@ -43,8 +44,9 @@ class PyOrderByTopTranslator(OrderByTopTranslator, PyTranslator):
     if self.l_capture:
       ctx.add_line("# {op}", op=self.op)
       size = "len(%s)" % self.bottom.v_rows
-      self.lindex.fw.initialize(size)
-      self.lindex.bw.initialize(size)
+      for lindex in self.lindexes:
+        lindex.fw.initialize(size)
+        lindex.bw.initialize(size)
 
     if self.child_translator:
       self.child_translator.produce(ctx)
