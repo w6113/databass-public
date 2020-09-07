@@ -16,6 +16,8 @@ class CompiledQuery(object):
     else:
       self.plan = qstr_or_plan
 
+    self.lineage_policy = lineage_policy
+
     self.opt = Optimizer()
     self.optimized_plan = self.opt(self.plan)
 

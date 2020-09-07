@@ -41,8 +41,11 @@ class PyCompiledQuery(CompiledQuery):
   def __call__(self, db=None):
     if not db:
       db = Database()
-    lineage = Lineage(self.plan)
-    self.lineages.append(lineage)
+    if self.lineage_policy is None or isinstance(self.lineage_policy, NoLineagePolicy):
+      lineage = None
+    else:
+      lineage = Lineage(self.plan)
+      self.lineages.append(lineage)
     return self.f(db, lineage)
 
 
