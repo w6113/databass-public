@@ -9,18 +9,18 @@ The following are steps to setup, complete, and submit your assignments
 1. Get started by forking the `databass-public` repository into the private repo `database-[YOUR UNI]` under your github account. You can request unlimited private repos as a student by getting the [student pack from GitHub](https://education.github.com/pack). Below is the recommended steps for forking a public repo into private repo:
 
 ```bash
-# 1) Create a bare clone of the repo locally (this temporary bare clone will be removed in the future)
+# 1) Create a bare clone of the repo locally (this bare clone is temporary and will be removed)
 git clone --bare git@github.com:w6113/databass-public.git
 
 # 2) Create a new empty private repository on GitHub.com and name it databass-[YOUR UNI]. 
 
 # 3) Mirror-push your local bare clone into the databass-[YOUR UNI]
-cd database-public.git
+cd databass-public.git
 git push --mirror git@github.com:[YOUR GITHUB USERNAME]/databass-[YOUR UNI].git
 
 # 4) Remove the temporary local bare repo from step 1
 cd ..
-rm -rf database-public.git
+rm -rf databass-public.git
 
 # 5) Clone the now privately remote databass repository into your local workspace
 cd [YOUR WORKING DIRECTORY]
