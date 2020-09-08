@@ -24,7 +24,7 @@ Installation using Python 3
     # key whatever command you need to turn on virtualenv
 
     # install the needed python packages
-    pip -r requirements.txt
+    pip install -r requirements.txt
 
 
 The repo includes incomplete test cases that you can run using `pytest`.

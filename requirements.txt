@@ -1,6 +1,7 @@
 pandas
 numpy
-readline
+gnureadline
 click
 pytest
 parsimonious
+sqlalchemy
