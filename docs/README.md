@@ -6,10 +6,10 @@ layout: page
 
 The following are steps to setup, complete, and submit your assignments
 
-1. Get started by forking the `databass-public` repository into the private repo `database-[YOUR UNI]` under your github account. You can request unlimited private repos as a student by getting the [student pack from GitHub](https://education.github.com/pack). Below is the recommended steps for forking a public repo into private repo:
+1. Get started by forking the `databass-public` repository into the private repo `databass-[YOUR UNI]` under your github account. You can request unlimited private repos as a student by getting the [student pack from GitHub](https://education.github.com/pack). Below is the recommended steps for forking a public repo into private repo:
 
 ```bash
-# 1) Create a bare clone of the repo locally (this bare clone is temporary and will be removed)
+# 1) Create a bare clone of the repo locally (this temporary bare clone will be removed in the future)
 git clone --bare git@github.com:w6113/databass-public.git
 
 # 2) Create a new empty private repository on GitHub.com and name it databass-[YOUR UNI]. 
@@ -42,12 +42,14 @@ upstream	DISABLE (push)
 
 To push changes for your assignment, you should use `origin`, eg: `git push origin [branch]`.
 
-If you want to pull / merge changes from `database-public`, you can just fetch the remote `upstream` and rebase/merge it on top of your work. Example command:
+If you want to update changes from `databass-public` to your branch, you can just fetch the remote `upstream` and rebase/merge it on top of your work. You can run the followingn command for updating your work with the upstream changes:
 
 ```
   git fetch upstream
   git rebase upstream/master
 ```
+
+and resolve conflicts if any.
 
 2. Make sure that your repository is PRIVATE and named `databass-UNI`.
 3. Add the staff's github accounts to the repo: `deka108` and `sirrice`
@@ -63,16 +65,22 @@ If you want to pull / merge changes from `database-public`, you can just fetch t
 
 Each assignment includes a set of basic test cases to help you sanity check your solution.   **Be aware that the tests are woefully incomplete**. Thus, we strongly encourage you that come up with, and write you own test cases to more thoroughly evaluate your own code.    We will assess your solutions using those included in the assignment, alongside a private set of test cases.
 
-<!--
-## Submission Overview
+## Asking Questions
+
+You can ask questions in the `#assignments` channel on slack.
+
+## Reporting Bugs
+
+You can report bugs on databass in the `#assignments` channel on slack and optionally open up a new GitHub issue on the `databass-public` repo. Before creating a new GitHub issue, please check first with the previous issues on the repo in case the bugs that you discover had already been reported / resolved before.
+
+<!-- ## Submission Overview
 
 Need to decide on how to submit if the above procedure is hard to automate
 
 * Use this pytest autograder?
   * https://github.com/ucsb-gradescope-tools/sample-python-pytest-autograder
   * https://github.com/ucsb-gradescope-tools/pytest_utils
-* Follow Chicago's protocol? https://github.com/UCHI-DB/course-info#submitting-your-lab
--->
+* Follow Chicago's protocol? https://github.com/UCHI-DB/course-info#submitting-your-lab -->
 
 
 ## Assignments
