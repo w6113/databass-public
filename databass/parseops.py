@@ -221,14 +221,14 @@ class PSelectQuery(POp):
           # A0: add orderby expressions to projection expressions (target list)
           #     You may wish to create internally aliased expressions that the
           #     Order By operator can later reference
-          # pass
+          pass
 
         if self.having_exprs:
           plan = Filter(plan, self.having_qual)
 
         if self.sorts:
           # A0: Add OrderBy operator
-          # pass
+          pass
 
         orig_aliases = [t.alias for t in self.targets]
         orig_exprs = [Attr(alias) for alias in orig_aliases]
