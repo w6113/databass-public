@@ -76,7 +76,7 @@ class TestBase(unittest.TestCase):
 
 
   def compare_results(self, rows1, rows2, order_matters):
-    if order_matters:
+    if not order_matters:
       rows1.sort()
       rows2.sort()
     try:
