@@ -32,7 +32,7 @@ if __name__ == "__main__":
   for row in compiled_q(db): 
     print(row)
   end = time.perf_counter()
-  print "Compiled query took %f seconds" % (end - start)
+  print("Compiled query took %f seconds" % (end - start))
 """
 
   with open(fname, "w") as out:
