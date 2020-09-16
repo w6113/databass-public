@@ -19,7 +19,10 @@ def unary(op, v):
   """
   if op == "+":
     return v
-  # A0: Edit the code to support the unary operations "-", and "not",
+  if op == "-":
+    return -v
+  if op.lower() == "not":
+    return not(v)
   raise Exception("unary op not implemented")
 
 def binary(op, l, r):
@@ -35,6 +38,12 @@ def binary(op, l, r):
   if op == "or": return l or r
   if op == "<": return l < r
   if op == ">": return l > r
+  if op == "/": return l / r
+  if op == "and": return bool(l and r)
+  if op == "in": return l in r
+  if op == "==": return l == r
+  if op == "<=": return l <= r
+  if op == ">=": return l >= r
   raise Exception("binary op not implemented")
 
 class ExprBase(Op):

@@ -218,17 +218,17 @@ class PSelectQuery(POp):
           plan.aliases.extend(self.having_aliases)
 
         if self.sorts:
-          # A0: add orderby expressions to projection expressions (target list)
-          #     You may wish to create internally aliased expressions that the
-          #     Order By operator can later reference
-          pass
+          order_aliases = ["_ordby_%d" % i for i in range(len(self.sorts))]
+          plan.project_exprs.extend([s.e for s in self.sorts])
+          plan.aliases.extend(["_ordby_%d" % i for i in range(len(self.sorts))])
 
         if self.having_exprs:
           plan = Filter(plan, self.having_qual)
 
         if self.sorts:
-          # A0: Add OrderBy operator
-          pass
+          order_exprs = [Attr(a, idx=i) for i,a in enumerate(order_aliases)]
+          order_ascdesc = [s.order for s in self.sorts]
+          plan = OrderBy(plan, order_exprs, order_ascdesc)
 
         orig_aliases = [t.alias for t in self.targets]
         orig_exprs = [Attr(alias) for alias in orig_aliases]
@@ -237,8 +237,9 @@ class PSelectQuery(POp):
 
     # ORDER BY
     if not self.is_agg_query and self.sorts:
-      # A0: add the OrderBy operator to query plan (see ops/orderby.py)
-      pass
+      order_exprs = [s.e for s in self.sorts]
+      order_ascdesc = [s.order for s in self.sorts]
+      plan = OrderBy(plan, order_exprs, order_ascdesc)
 
     # LIMIT
     if self.limit:

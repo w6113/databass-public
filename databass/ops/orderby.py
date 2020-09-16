@@ -27,8 +27,16 @@ class OrderBy(UnaryOp):
 
     Note: each row from the child operator may not be a distinct Tuple object
     """
-    # A0: implement me
-    raise Exception("Not implemented")
+    order = [1 if x == "asc" else -1 for x in self.ascdescs]
+
+    def keyf(row):
+      vals = tuple(expr(row) for expr in self.order_exprs)
+      return OBTuple(vals, order)
+
+    rows = [row.copy() for row in self.c]
+    rows.sort(key=keyf)
+    for row in rows:
+      yield row
 
   def __str__(self):
     args = ", ".join(["%s %s" % (e, ad) 

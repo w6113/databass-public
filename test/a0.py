@@ -7,6 +7,20 @@ class TestA0(TestBase):
         "SELECT 1 ORDER BY 1",
         "SELECT 1 ORDER BY a",
         "SELECT 1 ORDER BY a asc"
+        ,
+        "SELECT 1 ORDER BY 1+1",
+        "SELECT 1 ORDER BY 3+1",
+        "SELECT 1 ORDER BY (a)+1",
+        "SELECT 1 ORDER BY (a+1)",
+        "SELECT 1 ORDER BY a+b",
+        "SELECT 1 ORDER BY a+b asc",
+        "SELECT 1 ORDER BY a+b ASC",
+        "SELECT 1 ORDER BY a+b desc",
+        "SELECT 1 ORDER BY a+b, 1 desc",
+        "SELECT 1 ORDER BY a+b, 1+1 asc",
+        "SELECT 1 ORDER BY a+b, a+1 asc", 
+        "SELECT 1 ORDER BY a+b, a+c asc",
+        "SELECT 1 ORDER BY a asc, b desc"
 
     ]
     for q in qs:
@@ -16,6 +30,16 @@ class TestA0(TestBase):
         "SELECT 1 ORDER BY",
         "SELECT 1 ORDER ",
         "SELECT 1 ORDER BY 1(+1",
+        "SELECT 1 ORDER BY 3+1)",
+        "SELECT 1 ORDER BY a+1-",
+        "SELECT 1 ORDER BY a+/b",
+        "SELECT 1 ORDER BY a+b asec",
+        "SELECT 1 ORDER BY a+b ASc",
+        "SELECT 1 ORDER BY a+b asc asc",
+        "SELECT 1 ORDER BY a+b deSC",
+        "SELECT 1 ORDER BY a+b 1 desc",
+        "SELECT 1 ORDER BY a+b asc asc, a+1 asc",
+        "SELECT 1 ORDER BY a a"
     ]
     for q in badqs:
       with self.assertRaises(Exception):

@@ -46,10 +46,8 @@ grammar = Grammar(
     grouping_term  = ws expr
     having_clause  = HAVING wsp exprand
 
-    # A0: implement orderby grammar to support one or more expressions
-    #     where each expression may be optionally ASC or DESC (or asc/desc)
-    orderby      = ORDER BY
-    
+    orderby        = ORDER BY ordering_term (ws "," ordering_term)*
+    ordering_term  = ws expr (ASC/DESC)?
 
     limit          = LIMIT wsp expr (OFFSET wsp expr)?
 
@@ -288,11 +286,17 @@ class Visitor(NodeVisitor):
   def visit_having_clause(self, node, children):
     return children[-1]
 
-  # A0: implement visitor for orderby AST nodes
-  #     should return a list of PSort objects
-  #     see parseops.py
   def visit_orderby(self, node, children):
-    return []
+    terms = flatten(children, 2, 3)
+    ret = []
+    for expr, ascdesc in terms:
+      ret.append(PSort(expr, ascdesc))
+    return ret
+
+  def visit_ordering_term(self, node, children):
+    expr = children[1]
+    order = children[2]
+    return (expr, order)
 
   def visit_ASC(self, node, children):
     return PSort.ASC
