@@ -1,7 +1,7 @@
 import os
 import json
 import unittest
-from .util import *
+from .conftest import *
 from databass import *
 from databass.ops import *
 from databass.exprutil import predicate_to_cnf

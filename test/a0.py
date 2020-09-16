@@ -1,9 +1,7 @@
-from .util import *
+from .conftest import *
 from databass.parse_sql import *
 
-class TestA0(TestBase):
-  def test_parsing(self):
-    qs = [
+parse_qs = [
         "SELECT 1 ORDER BY 1",
         "SELECT 1 ORDER BY a",
         "SELECT 1 ORDER BY a asc"
@@ -23,10 +21,8 @@ class TestA0(TestBase):
         "SELECT 1 ORDER BY a asc, b desc"
 
     ]
-    for q in qs:
-      Visitor().parse(q)
 
-    badqs = [
+parse_badqs = [
         "SELECT 1 ORDER BY",
         "SELECT 1 ORDER ",
         "SELECT 1 ORDER BY 1(+1",
@@ -41,27 +37,39 @@ class TestA0(TestBase):
         "SELECT 1 ORDER BY a+b asc asc, a+1 asc",
         "SELECT 1 ORDER BY a a"
     ]
-    for q in badqs:
-      with self.assertRaises(Exception):
-        Visitor().parse(q)
 
 
-  def test_end2end(self):
-    qs = [
-        "SELECT * from data ORDER BY 1",
-        "SELECT a+b FROM data ORDER BY a",
-        "SELECT * from data ORDER BY a asc",
-        "SELECT * from data ORDER BY a",
-        "SELECT * from data ORDER BY a desc"
-    ]
+end2end_qs = [
+    "SELECT * from data ORDER BY 1",
+    "SELECT a+b FROM data ORDER BY a",
+    "SELECT * from data ORDER BY a asc",
+    "SELECT * from data ORDER BY a",
+    "SELECT * from data ORDER BY a desc"
+]
 
-    for q in qs:
-      self.run_query(q, True)
+end2end_badqs = [
+    "SELECT 1 ORDER BY a"
+]
 
-    badqs = [
-        "SELECT 1 ORDER BY a"
-    ]
-    for q in badqs:
-      with self.assertRaises(Exception):
-        self.run_query(q, True)
+
+@pytest.mark.parametrize("q", parse_qs)
+def test_parsing(q):
+  Visitor().parse(q)
+
+@pytest.mark.parametrize("q", parse_badqs)
+def test_bad_parsing(q):
+  with pytest.raises(Exception):
+    Visitor().parse(q)
+
+@pytest.mark.parametrize("q", end2end_qs)
+@pytest.mark.usefixtures('context')
+def test_q(context, q):
+  run_query(context, q, True)
+
+@pytest.mark.parametrize("q", end2end_badqs)
+@pytest.mark.usefixtures('context')
+def test_badq(context, q):
+  with pytest.raises(Exception):
+    run_query(context, q, True)
+
 
