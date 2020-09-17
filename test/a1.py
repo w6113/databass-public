@@ -63,27 +63,49 @@ full_qs = [
 
 ]
 
-@pytest.mark.parametrize("q", limit_qs + subquery + full_qs)
+phase1 = lambda v: "test_phase1"
+phase2 = lambda v: "test_phase2"
+
+@pytest.mark.parametrize("q", limit_qs, ids=phase1)
 @pytest.mark.usefixtures('context')
-def test_q(context, q):
+def test_q_limit(context, q):
   run_query(context, q)
 
-@pytest.mark.parametrize("q", limit_badqs)
+@pytest.mark.parametrize("q", subquery + full_qs, ids=phase2)
+@pytest.mark.usefixtures('context')
+def test_q_phase2(context, q):
+  run_query(context, q)
+
+
+
+@pytest.mark.parametrize("q", limit_badqs, ids=phase1)
 @pytest.mark.usefixtures('context')
 def test_badq(context, q):
   with pytest.raises(Exception):
     run_query(context, q)
 
-@pytest.mark.parametrize("q,ordered", project_qs_ordered)
+@pytest.mark.parametrize("q,ordered", project_qs_ordered, ids=phase2)
 @pytest.mark.usefixtures('context')
 def test_q_ordered(context, q, ordered):
   run_query(context, q, ordered)
 
 
 
-@pytest.mark.parametrize("plan,q", distinct_inputs+hashjoins)
+@pytest.mark.parametrize("plan,q", distinct_inputs, ids=phase1)
 @pytest.mark.usefixtures('context')
-def test_plan(context, plan, q):
+def test_plan_distinct(context, plan, q):
+  """
+  plan: the plan to evaluate
+  q: query to run on sqlite
+  """
+  rows1 = run_plan(context, plan)
+  rows2 = run_sqlite_query(context, q)  
+  compare_results(context, rows1, rows2, False)
+
+
+@pytest.mark.parametrize("plan,q", hashjoins, ids=phase2)
+@pytest.mark.usefixtures('context')
+def test_plan_hj(context, plan, q):
   """
   plan: the plan to evaluate
   q: query to run on sqlite
@@ -94,14 +116,14 @@ def test_plan(context, plan, q):
 
 
 
-@pytest.mark.parametrize("plan,schema", project_schema)
+@pytest.mark.parametrize("plan,schema", project_schema, ids=phase2)
 @pytest.mark.usefixtures('context')
 def test_schema(context, plan, schema):
   plan = context['opt'](plan)
   check_schema(context, schema, plan.schema)
 
 
-@pytest.mark.usefixtures('context')
+@pytest.mark.usefixtures('context', ids=phase2)
 def test_groupby(context):
   q_res = [(2.0, 200, 10), (3.0, 220, 10)]
   schema = Schema([ Attr("c", "num"), Attr("sum", "num"), Attr("count", "num") ])
@@ -116,6 +138,5 @@ def test_groupby(context):
 
   res = run_plan(context, plan)
   compare_results(context, q_res, res, False)
-
 
 
