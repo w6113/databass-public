@@ -440,6 +440,17 @@ class Attr(ExprBase):
       return False
     return self.aname == attr.aname
 
+  def in_attr_list(self, attrs):
+    """
+    Given list of Attr objects, check whether self
+    matches with any of them
+    """
+    for other in attrs:
+      if other.matches(self): return True
+    return False
+
+
+
   def __call__(self, row, *args):
     return row[self.idx]
 

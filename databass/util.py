@@ -7,6 +7,16 @@ def pickone(l, attr):
 def flatten(list_of_lists):
   return [item for sublist in list_of_lists for item in sublist]
 
+def deduplicate(iterable, keyf=None):
+  if keyf is None:
+    keyf = str
+  seen = set()
+  for i in iterable:
+    key = keyf(i)
+    if key in seen: continue
+    yield i
+    seen.add(key)
+
 def cond_to_func(expr_or_func):
   """
   Helper function to help automatically interpret string expressions 

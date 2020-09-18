@@ -25,6 +25,7 @@ from .baseops import *
 from .ops import *
 from .exprs import *
 from .exprutil import predicate_to_cnf
+from .util import deduplicate
 
 class POp(Op):
   """
@@ -478,11 +479,12 @@ class PSelectQuery(POp):
     # If there are grouping exprs, then all non-agg
     # expressions in target list better be grouping exprs
     gb_attrs = [list(e.referenced_attrs) for e in self.groups]
-    gb_attrs = set(map(str, chain(*gb_attrs)))
+    gb_attrs = list(deduplicate(chain(*gb_attrs)))
+    #gb_attrs = set(map(str, chain(*gb_attrs)))
     if gb_attrs:
       for i in nonaggs:
         t = self.targets[i]
-        if not all(str(a) in gb_attrs for a in t.e.referenced_attrs):
+        if not all(a.in_attr_list(gb_attrs) for a in t.e.referenced_attrs):
           raise Exception("%s uses attrs not in the groupby clause: %s" % (
             str(t.e), ", ".join(gb_attrs)))
 
@@ -496,24 +498,25 @@ class PSelectQuery(POp):
 
       # move all AggFunc into aggs, and replace
       # with attribute references
-      tmp = list(self.having_qual.collect(AggFunc))
-      for agg in tmp:
+      tmp = self.get_having_exprs(self.having_qual)
+      for expr in tmp:
         alias = self.new_target_alias()
-        having_exprs.append(agg)
+        having_exprs.append(expr)
         having_aliases.append(alias)
-        agg.replace(Attr(alias, "num"))
-      
+        expr.replace(Attr(alias, "num"))
+
     self.having_exprs = having_exprs
     self.having_aliases = having_aliases
 
     for q in self.all_subqueries:
       q.check_groupby()
 
+
   def check_having_expr(self, e, gb_attrs):
     until = lambda op: op.is_type(AggFunc)
     def f(op, path):
       if op.is_type(Attr):
-        if op not in gb_attrs:
+        if not op.in_attr_list(gb_attrs):
           raise Exception("%s should be in groupby clause or in agg function" % op)
     
     self.having_qual.traverse(f, until=until)
@@ -552,6 +555,11 @@ class PSelectQuery(POp):
       if r.typ == PRangeVar.QUERY:
         yield r.e
 
+  #
+  #
+  # Accessor helpers
+  #
+  #
 
   def get_exprs(self):
     """
@@ -577,6 +585,20 @@ class PSelectQuery(POp):
     until = lambda n: n.is_type(PSelectQuery)
     for e in self.get_exprs():
       ret.extend(e.collect(Attr, until))
+    return ret
+
+  def get_having_exprs(self, qual):
+    """
+    Return all AggFunc and Attr expressions in @qual,
+    where the Attrs are not a descendant of an AggFunc
+    """
+    aggfuncs = qual.collect(AggFunc)
+    attrs = qual.collect(Attr)
+    ret = list(aggfuncs)
+    for attr in attrs:
+      if any(attr.is_ancestor(aggfunc) for aggfunc in aggfuncs):
+        continue
+      ret.append(attr)
     return ret
 
   def get_immediate_subqueries(self, e):

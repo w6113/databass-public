@@ -46,6 +46,16 @@ subquery = [
   "SELECT * FROM (SELECT * FROM data)"
 ]
 
+gb_bad = [
+  "SELECT b FROM data GROUP BY a",
+]
+
+gb_qs = [
+  "SELECT 1 FROM data GROUP BY a",
+  "SELECT a, sum(b) FROM data GROUP BY a HAVING a = 1",
+  "SELECT sum(b) FROM data GROUP BY a HAVING a = 1",
+]
+
 hashjoins = [
   (HashJoin(Scan('data', 'd1'), Scan('data', "d2"),
           list(map(cond_to_func, ["d1.a", "d2.c"]))),
@@ -71,7 +81,7 @@ phase2 = lambda v: "test_phase2"
 def test_q_limit(context, q):
   run_query(context, q)
 
-@pytest.mark.parametrize("q", subquery + full_qs, ids=phase2)
+@pytest.mark.parametrize("q", gb_qs + subquery + full_qs, ids=phase2)
 @pytest.mark.usefixtures('context')
 def test_q_phase2(context, q):
   run_query(context, q)
@@ -80,9 +90,17 @@ def test_q_phase2(context, q):
 
 @pytest.mark.parametrize("q", limit_badqs, ids=phase1)
 @pytest.mark.usefixtures('context')
-def test_badq(context, q):
+def test_badq_limit(context, q):
   with pytest.raises(Exception):
     run_query(context, q)
+
+@pytest.mark.parametrize("q", gb_bad, ids=phase2)
+@pytest.mark.usefixtures('context')
+def test_badq_phase2(context, q):
+  with pytest.raises(Exception):
+    run_query(context, q)
+
+
 
 @pytest.mark.parametrize("q,ordered", project_qs_ordered, ids=phase2)
 @pytest.mark.usefixtures('context')
