@@ -304,7 +304,7 @@ class ScalarFunc(ExprBase):
 
   def __call__(self, row, row2=None):
     args = [arg(row) for arg in self.args]
-    return f(*args)
+    return self.f(*args)
 
   def __str__(self):
     args = ",".join(map(str, self.args))
