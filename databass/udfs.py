@@ -113,7 +113,7 @@ class UDFRegistry(object):
 #
 registry = UDFRegistry.registry()
 registry.add(ScalarUDF("lower", 1, lambda s: str(s).lower()))
-registry.add(ScalarUDF("upper", 1, lambda s: str(s).lower()))
+registry.add(ScalarUDF("upper", 1, lambda s: str(s).upper()))
 
 #
 # Prepopulate with incremental aggregation functions

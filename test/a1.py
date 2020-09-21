@@ -141,8 +141,9 @@ def test_schema(context, plan, schema):
   check_schema(context, schema, plan.schema)
 
 
-@pytest.mark.usefixtures('context', ids=phase2)
-def test_groupby(context):
+@pytest.mark.parametrize("dummy", [''], ids=phase2)
+@pytest.mark.usefixtures('context')
+def test_groupby(context, dummy):
   q_res = [(2.0, 200, 10), (3.0, 220, 10)]
   schema = Schema([ Attr("c", "num"), Attr("sum", "num"), Attr("count", "num") ])
   group_term_schema = Schema([Attr("c", "num")])
