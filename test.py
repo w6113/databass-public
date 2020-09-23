@@ -39,59 +39,64 @@ def make_query(n):
   return plan
 
 
-# Example of running a SQL string
-parsetree = parse("""
-    SELECT sum(b)
-    FROM data
-    GROUP BY a
-    HAVING sum(c) > 0
-    ORDER BY a*2""")
-plan = parsetree.to_plan()
-optimize_and_run(plan)
+# Set flag to True for example of running a SQL string
+if 0:
+  parsetree = parse("""
+      SELECT sum(b)
+      FROM data
+      GROUP BY a
+      HAVING sum(c) > 0
+      ORDER BY a*2""")
+  plan = parsetree.to_plan()
+  optimize_and_run(plan)
 
-# Example of building a join query plan and running it
-preds = predicate_to_cnf(cond_to_func("(A.a = B.a)"))
-logicalplan = From([
-  Scan("data", "A"),
-  Scan("data", "B")
-], preds)
-optimize_and_run(logicalplan)
-
-
-# Example runs Selinger and Exhaustive join optimizers on varying # of relations
-db = Database.db()
-opt1 = Optimizer(db, SelingerOpt)
-opt2 = Optimizer(db, JoinOptExhaustive)
-
-data = []
-for i in range(1, 8):
-  plan1 = opt1(make_query(i))
-  plan2 = opt2(make_query(i))
-  n1 = opt1.join_optimizer.plans_tested
-  n2 = opt2.join_optimizer.plans_tested
-  data.append(dict( x=i, y=n1, opt="Selinger"))
-  data.append(dict( x=i, y=n2, opt="Exhaustive"))
-  print((i, n1, n2))
-
-try:
-  # plot the curves
-  from pygg import *
-  from wuutils import *
-  p = ggplot(data, aes(x='x', y='y', color='opt', group='opt'))
-  p += geom_line()
-  p += axis_labels("Num Relations", "Num Plans Tested")
-  p += legend_bottom
-  ggsave("join_costs.png", p, width=6, height=4)
-except:
-  pass
+# Set flag to True for Example of building a join query plan and running it
+if 0:
+  preds = predicate_to_cnf(cond_to_func("(A.a = B.a)"))
+  logicalplan = From([
+    Scan("data", "A"),
+    Scan("data", "B")
+  ], preds)
+  optimize_and_run(logicalplan)
 
 
-# Example of compiling a query
-plan = Yield(opt(parse("SELECT a, a+b FROM data").to_plan()))
-q = PyCompiledQuery(plan, None)
-print(q.print_code())
-for row in q():
-  print(row)
+# Set flag to True for Example that runs Selinger and 
+# Exhaustive join optimizers on varying # of relations
+if 0:
+  db = Database.db()
+  opt1 = Optimizer(db, SelingerOpt)
+  opt2 = Optimizer(db, JoinOptExhaustive)
+
+  data = []
+  for i in range(1, 8):
+    plan1 = opt1(make_query(i))
+    plan2 = opt2(make_query(i))
+    n1 = opt1.join_optimizer.plans_tested
+    n2 = opt2.join_optimizer.plans_tested
+    data.append(dict( x=i, y=n1, opt="Selinger"))
+    data.append(dict( x=i, y=n2, opt="Exhaustive"))
+    print((i, n1, n2))
+
+  try:
+    # plot the curves
+    from pygg import *
+    from wuutils import *
+    p = ggplot(data, aes(x='x', y='y', color='opt', group='opt'))
+    p += geom_line()
+    p += axis_labels("Num Relations", "Num Plans Tested")
+    p += legend_bottom
+    ggsave("join_costs.png", p, width=6, height=4)
+  except:
+    pass
+
+
+# Set flag to True for Example of compiling a query
+if 0:
+  plan = Yield(opt(parse("SELECT a, a+b FROM data").to_plan()))
+  q = PyCompiledQuery(plan, None)
+  print(q.print_code())
+  for row in q():
+    print(row)
 
 
 
