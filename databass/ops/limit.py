@@ -35,8 +35,14 @@ class Limit(UnaryOp):
     LIMIT should skip <offset> number of rows, and yield at most <limit>
     number of rows
     """
-    # A1: IMPLEMENT THIS
-    raise Exception("Not implemented")
+    nyielded = 0
+    for i, row in enumerate(self.c):
+      if i < self._offset: 
+        continue
+      if nyielded >= self._limit:
+        break
+      nyielded += 1
+      yield row
 
   def __str__(self):
     return "LIMIT(%s OFFSET %s)" % (self.limit, self.offset)

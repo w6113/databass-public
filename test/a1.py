@@ -12,9 +12,16 @@ from databass.tables import InMemoryTable
 limit_qs = [
     "SELECT * FROM tdata LIMIT 2",
     "SELECT * FROM tdata LIMIT 1+1"
+    ,
+    "SELECT * FROM tdata LIMIT (2*2)-2",
+    "SELECT * FROM tdata LIMIT true"
 ]
 limit_badqs = [
     "SELECT * FROM tdata LIMIT a",
+    "SELECT * FROM tdata LIMIT b",
+    "SELECT * FROM tdata LIMIT 1, a"
+    "SELECT * FROM tdata LIMIT 1,1",
+    "SELECT * FROM tdata LIMIT 'foo'"
 ]
 distinct_inputs = [
   (Distinct(Scan("tdata")), "SELECT distinct * FROM tdata")
@@ -44,22 +51,38 @@ project_qs_ordered = [
 
 subquery = [
   "SELECT * FROM (SELECT * FROM data)"
+  ,
+  "SELECT * FROM (SELECT a+b, a FROM data as d1) as d2",
+  "SELECT * FROM (SELECT a+b, a FROM data as d1) as d2 WHERE d2.a > 1",
+  "SELECT * FROM (SELECT a+b, a FROM data as d1 WHERE d1.a > 1) as d2 WHERE d2.a > 1",
+  "SELECT * FROM (SELECT a+b, a FROM data as d1 WHERE d1.a > 2) as d2 WHERE d2.a > 1"
 ]
 
 gb_bad = [
   "SELECT b FROM data GROUP BY a",
+  "SELECT b FROM data GROUP BY 1",
+  "SELECT a FROM data GROUP BY a HAVING b > 2"
 ]
 
 gb_qs = [
   "SELECT 1 FROM data GROUP BY a",
   "SELECT a, sum(b) FROM data GROUP BY a HAVING a = 1",
   "SELECT sum(b) FROM data GROUP BY a HAVING a = 1",
+  "SELECT a FROM data GROUP BY a",
+  "SELECT sum(b) FROM data GROUP BY a",
+  "SELECT sum(a) FROM data GROUP BY a",
+  "SELECT sum(b) FROM data GROUP BY a HAVING 1 = 1",
+  "SELECT a, sum(b) FROM data GROUP BY a HAVING a = a",
+  "SELECT a, sum(b) FROM data GROUP BY a HAVING sum(b) > 2"
 ]
 
 hashjoins = [
   (HashJoin(Scan('data', 'd1'), Scan('data', "d2"),
           list(map(cond_to_func, ["d1.a", "d2.c"]))),
    "SELECT * from data d1, data d2 where d1.a = d2.c"),
+  (HashJoin(Scan('data', 'd1'), Filter(Scan('data', "d2"), cond_to_func("d2.c = 1")),
+            list(map(cond_to_func, ["d1.a", "d2.c"]))),
+   "SELECT * from data d1, (SELECT * FROM data WHERE c = 1) d2 where d1.a = d2.c")
     
 ]
 
@@ -70,6 +93,18 @@ full_qs = [
          (SELECT d AS y, sum(b) AS z
           FROM data GROUP BY d+1) AS d3
     WHERE d2.z = d3.y ORDER BY x""",
+  """SELECT d2.x
+    FROM (SELECT a AS x, count(b) AS z
+          FROM data GROUP BY a) AS d2,
+         (SELECT d AS y, sum(b) AS z
+          FROM data GROUP BY d+1) AS d3
+    WHERE d2.z <> d3.y ORDER BY x""",
+  """SELECT d2.x+d3.y
+    FROM (SELECT a AS x, count(b) AS z
+          FROM data GROUP BY a) AS d2,
+         (SELECT d AS y, sum(b) AS z
+          FROM data GROUP BY d+1) AS d3
+    WHERE d2.z = d3.y ORDER BY x, d2.z, d3.z""",
 
 ]
 

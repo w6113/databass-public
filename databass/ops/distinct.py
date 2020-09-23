@@ -13,6 +13,12 @@ class Distinct(UnaryOp):
     """
     It is OK to use hash(row) to check for equivalence between rows
     """
-    # A1: IMPLEMENT THIS
-    raise Exception("Not implemented")
+    seen = set()
+    for row in self.c:
+      key = hash(row)
+      if key in seen: 
+        continue
+
+      yield row
+      seen.add(key)
 

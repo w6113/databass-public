@@ -42,10 +42,20 @@ class HashJoin(Join):
     lidx = self.join_attrs[0].idx
     ridx = self.join_attrs[1].idx
 
-    # A1: implement hash join implementation.  
-    #     First read the right and build an appropriate hash table,
-    #     Then iterate over the left to probe the hash table
-    raise Exception("Not implemented")
+    index = self.build_hash_index(self.r, ridx)
+
+    for lrow in self.l:
+      # probe the hash index
+      lval = lrow[lidx]
+      key = hash(lval)
+      matches = index[key]
+
+      # generate outputs for all matching tuples
+      irow.row[:len(lrow.row)] = lrow.row
+      for rrow in matches:
+        irow.row[len(lrow.row):] = rrow.row
+        # TODO: typically, check join condition again
+        yield irow
 
   def build_hash_index(self, child_iter, idx):
     """
@@ -55,8 +65,11 @@ class HashJoin(Join):
     Loops through a tuple iterator and creates an index based on
     the attr value
     """
-    # A1: Build hash table.  You may find defaultdict useful
-    index = None
+    index = defaultdict(list)
+    for row in child_iter:
+      val = row[idx]
+      key = hash(val)
+      index[key].append(row.copy())
     return index
 
 

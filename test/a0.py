@@ -45,10 +45,27 @@ end2end_qs = [
     "SELECT * from data ORDER BY a asc",
     "SELECT * from data ORDER BY a",
     "SELECT * from data ORDER BY a desc"
+    ,
+    "SELECT * from data ORDER BY a, b",
+    "SELECT * from data ORDER BY a asc, b asc",
+    "SELECT * from data ORDER BY a asc, b desc",
+    "SELECT * from data ORDER BY a desc, b asc",
+    "SELECT * from data ORDER BY a desc, b desc",
+    "SELECT * from data ORDER BY a+1 desc, b desc",
+    "SELECT * from data ORDER BY a+1 desc, b+2 desc",
+    "SELECT * from data ORDER BY -a, -b",
+    "SELECT * from data ORDER BY -a, -b desc",
+    "SELECT * from data ORDER BY -a desc, -b"
 ]
 
 end2end_badqs = [
     "SELECT 1 ORDER BY a"
+    ,
+    "SELECT 1 ORDER BY (a+b1)+1 asc",
+    "SELECT 1 FROM data ORDER BY (a+b1)+1 asc",
+    "SELECT 1 FROM data ORDER BY (1, 1)+1 asc",
+    "SELECT 1 FROM data ORDER BY (a+b, 1)+1 asc",
+    "SELECT 1 ORDER BY a+b, a+c asc"
 ]
 
 

@@ -128,6 +128,25 @@ class JoinOpt(object):
     cond = cnf_to_predicate(preds)
     ret.extend([ThetaJoin(l, r, cond), ThetaJoin(r, l, cond)])
 
+    # # hash joins only uses one predicate, so the rest need to be
+    # # applied as post-join filters
+    for i, pred in enumerate(preds):
+      if not (hasattr(pred, "op") and pred.op == "="): continue
+      if not (pred.l.is_type(Attr) and pred.r.is_type(Attr)): continue
+      if pred.l.tablename in lji.aliases and pred.r.tablename in rji.aliases:
+        p1 = HashJoin(l, r, [pred.l, pred.r])
+        p2 = HashJoin(r, l, [pred.r, pred.l])
+      elif pred.l.tablename in rji.aliases and pred.r.tablename in lji.aliases:
+        p1 = HashJoin(l, r, [pred.r, pred.l])
+        p2 = HashJoin(r, l, [pred.l, pred.r])
+      else:
+        continue
+
+      cond = cnf_to_predicate(preds[:i] + preds[i+1:])
+      if cond:
+        p1 = Filter(p1, cond)
+        p2 = Filter(p2, cond)
+      ret.extend([p1, p2])
 
     # reset parent pointers
     l.p, r.p = lp, rp

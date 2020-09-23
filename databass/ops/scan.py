@@ -28,8 +28,8 @@ class SubQuerySource(Source):
     self.alias = alias 
 
   def __iter__(self):
-    # A1: implement me
-    yield None
+    for row in self.c:
+      yield row
 
   def init_schema(self):
     """
