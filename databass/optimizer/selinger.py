@@ -31,7 +31,7 @@ class SelingerOpt(JoinOpt):
           ji = cand.merge(item)
 
           if not ji.predicates: continue
-          if ji in join_infos[key]: continue
+          if hash(ji) in join_infos[key]: continue
 
           self.evaluate_new_join_info(ji, join_infos)
           if ji.best_plan:
