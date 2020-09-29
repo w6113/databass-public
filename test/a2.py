@@ -30,6 +30,20 @@ def test_join(context):
     }
   margin = 0.2
 
+  # add the dummy tables to the database
+  # the data in the public tests use uniform distribution.
+  # you can try other ditsributions!
+  db = context['db']
+  sqlite = context['sqlite']
+  for i in range(10):
+    tname = "T%s" % i
+    sqlite.execute("DROP TABLE IF EXISTS %s" % tname)
+    df = pd.DataFrame(np.random.randint(0, 100, size=(1000, 4)), columns=list("abcd"))
+    db.register_dataframe(tname, df)
+    db._df_registry[tname].to_sql(tname, sqlite, index=False)
+
+
+
   # check that the number of plans your selinger algorithm takes
   # is less than max(our selinger, our exhaustive) and within 20% of
   # our implementation
