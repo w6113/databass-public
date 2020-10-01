@@ -90,4 +90,4 @@ Need to decide on how to submit if the above procedure is hard to automate
 * [A2](./a2.md): Join optimization
 * [A3](./a3.md): Query Compilation
 * [A4](./a4.md): Benchmarking
-* [A5](./a5.md): Lineage
+* [A5](./a5.md): Lineage (optional)
