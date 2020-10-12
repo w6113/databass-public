@@ -17,7 +17,11 @@ class SelingerOpt(JoinOpt):
     join_infos = defaultdict(dict)
 
     # initialize single relation join infos, cost the plans, and cache them
-    # A2: implement me
+    for source in sources:
+      ji = self.new_join_info(source)
+      ji.best_plan = source
+      ji.best_cost = self.cost(source)
+      join_infos[1][hash(ji)] = ji
 
     # Find the optimal for plans of increasing size, starting from size 2 plans
     while len(join_infos) < len(sources):
@@ -46,7 +50,15 @@ class SelingerOpt(JoinOpt):
       # The order you crossproduct the remaining relations doesn't matter
       # but join_infos should be updated in each iteration 
       if len(join_infos[key]) == 0:
-        # A2: implement me
+        ji = min(join_infos[key-1].values(), key=lambda ji: ji.best_cost)
+        for item in join_infos[1].values():
+          if ji.overlaps(item): continue
+          plan = ThetaJoin(ji.best_plan, item.best_plan, Bool(True))
+          ji = ji.merge(item)
+          ji.best_plan = plan
+          ji.best_cost = self.cost(plan)
+          join_infos[key][hash(ji)] = ji
+          key += 1
         break
 
     # there should only be one JoinInfo for all sources
@@ -70,9 +82,21 @@ class SelingerOpt(JoinOpt):
 
     When method returns, @ji.best_plan and best_cost should be set to the optimal
     """
-    # A2: implement me
-    #     get_join_info(), and valid_join_impls() may help
-    pass
+    for i, rel in enumerate(ji.rels):
+      rest = ji.rels[:i] + ji.rels[i+1:]
+
+      ji1 = self.get_join_info([rel], join_infos)
+      ji2 = self.get_join_info(rest, join_infos)
+
+      if not ji2:
+        raise Exception("didn't find join info for: %s" % rest)
+
+      plans = self.valid_join_impls(ji1, ji2)
+      for plan in plans:
+        cost = self.cost(plan)
+
+        if cost <= ji.best_cost:
+          ji.best_plan, ji.best_cost = plan, cost
 
   def get_join_info(self, rels, join_infos):
     """

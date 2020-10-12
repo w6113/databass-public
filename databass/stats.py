@@ -15,8 +15,7 @@ class Stats(object):
   
   def __init__(self, table):
     self.table = table
-    # A2: compute the exact table cardinality
-    self.card = 10
+    self.card = len(table.rows)
 
     self.col_stats = dict()
 
@@ -30,8 +29,15 @@ class Stats(object):
     @return the domain of the @attr as a dictionary with keys:
             min, max, and distinct
     """
-    # A2: compute the actual min, max, ndistinct for the column
-    #     "str" type attributes don't have a min and max
-    return dict(min=0, max=10, ndistinct=10)
+    col = self.table.col_values(attr)
+    if self.table.schema.get_type(attr) == "num":
+      return dict(
+          min=min(col), 
+          max=max(col),
+          ndistinct=len(set(col)))
+    return dict(
+        min=None,
+        max=None,
+        ndistinct=len(set(col)))
 
 

@@ -63,9 +63,9 @@ class Estimator(object):
     if op.is_type(Scan):
       return 1.0
     if op.is_type(HashJoin):
-      # A2: return selectivite for hashjoin.  It is more precise
-      #     than for a generic thetajoin
-      return 0
+      lsel = self.selectivity_cond(op.join_attrs[0])
+      rsel = self.selectivity_cond(op.join_attrs[1])
+      return min([lsel, rsel, 1.0])
     if op.is_type(ThetaJoin):
       return self.selectivity_cond(op.cond)
     if op.is_type(Filter):
@@ -83,19 +83,15 @@ class Estimator(object):
       return self.selectivity_attr(cond)
 
     if cond.op == "and":
-      # A2: implement selectivity estimation of conjuctive predicates
-      #     assuming independence
-      pass
+      lsel = self.selectivity_cond(cond.l)
+      rsel = self.selectivity_cond(cond.r)
+      return lsel * rsel
 
     if cond.op == "=":
-      # A2: implement selectivity estimation for equality predicate  of the form:
-      #        expression = LITERAL
       if cond.r.is_type(Literal):
-        # implement me
-        pass
+        return self.selectivity_cond(cond.l)
       elif cond.l.is_type(Literal):
-        # implement me
-        pass
+        return self.selectivity_cond(cond.r)
 
     return self.DEFAULT_SELECTIVITY
 
@@ -122,12 +118,9 @@ class Estimator(object):
     stat = table.stats[attr]
     typ = table.schema.get_type(attr)
     if typ == "num":
-      # A2: Write code to estimate the selectivity of the numeric attribute.
-      # You can add 1 to the denominator to avoid divide by 0 errors
-      sel = 1.0
+      sel = 1.0 / (stat["max"] - stat["min"] + 1)
     elif typ == "str":
-      # A2: Write code to estimaote the selectivity of the non-numeric attribute
-      sel = 1.0
+      sel = 1.0 / stat["ndistinct"]
     else:
       sel = 0.05
     return sel
