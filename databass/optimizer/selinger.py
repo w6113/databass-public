@@ -89,7 +89,8 @@ class SelingerOpt(JoinOpt):
       ji2 = self.get_join_info(rest, join_infos)
 
       if not ji2:
-        raise Exception("didn't find join info for: %s" % rest)
+        #raise Exception("didn't find join info for: %s" % rest)
+        continue
 
       plans = self.valid_join_impls(ji1, ji2)
       for plan in plans:

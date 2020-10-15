@@ -16,7 +16,7 @@ optimizes, and compiles a query, and also sets up the lineage manager
 on your behalf.  
 
 **Note:** you can feel free to avoid the discussion and code related to lineage
-as it is not needed for the assignments.
+as it is not needed until the optional A5.
 
 ```
 '''
@@ -61,19 +61,20 @@ Query compilation proceeds in the following stages
   responsible for generating the operator's query compiled code.
   There is one translator for each physical operator.
   * Pipeline breakers are split into two translators: one for collecting tuples
-    and the other for processing and emiting operator outputs.   ([./pipeline.py](./pipeline.py))
+    and the other for processing and emiting operator outputs.   ([./pipeline.py#L137](./pipeline.py#L137))
 * Walk the translation plan and create lineage indexes (lindexes) at translators
-  that need to capture or materialize lineage.  
+  that need to capture or materialize lineage.   (Skip this for A1-4)
   * The translators that capture lineage depends on the lineage policy.
     The policy specifies the pairs of operators that databass needs to
     materialize a lineage index for.  See [./lpolicy.py](./lpolicy.py).
   * An operator does not capture lineage if it is not along the path 
     between any pair of operators that the policy asks to materialize.  
   * An operator along a path needs to capture lineage, but can delete 
-    the lineage once its information has been propagated to the next operator.  
+    the lineage once its information has been propagated to the next operator.
     See [translator.clean_prev_lineage_indexes()](./translator.py#L51) 
 * Calling produce on the root of the translation plan generates the compiled
   code.  The main logic is embedded in the translator classes.  
+* Notes on lineage instrumentation:
   * Lineage instrumentation logic in the compiled code is controlled by
     an `if self.l_capture` condition.   If a translator does not have `l_capture`
     set, then we don't instrument the generated code.

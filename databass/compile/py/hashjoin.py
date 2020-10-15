@@ -48,6 +48,9 @@ class PyHashJoinRightTranslator(HashJoinRightTranslator, PyRightTranslator):
     1. compute right key, 
     2. probe hash table, 
     3. create intermediate row to pass to parent's consume
+
+    Note that because the hash key may not be unique, it's good hygiene
+    to check the join condition again when probing.
     """
     # reference to the left translator's hash table variable
     v_ht = self.left.v_ht

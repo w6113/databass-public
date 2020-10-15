@@ -125,9 +125,9 @@ class Pipelines(object):
       Query Plan          Pipelines
     --------------    -----------------
          GrpBy         [A, Joinleft]
-           |           [B, Joinright]
-          Join     ->  [Joinright, GrpBy]
-          / \
+           |           [B, Joinright, GrpByBottom]
+          Join     ->  [GrpByTop] 
+          / \          
          A   B
 
     A new pipeline is created at a pipeline breaker (agg, orderby, hashjoin, etc).

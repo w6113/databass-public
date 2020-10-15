@@ -6,6 +6,14 @@ from .translator import *
 class PyOrderByBottomTranslator(OrderByBottomTranslator, PyTranslator):
 
   def produce(self, ctx):
+    """
+    Define the buffer (list) that will store copies of every input row.
+    We will also define a key function used to sort the buffered rows.
+    The key function evaluates the order by expressions, then wraps 
+    the results in an OBTuple that internally defines __cmp__.
+    (see databass.util for OBTuple definition)
+
+    """
     self.v_rows = ctx.new_var("ord_rows")
     self.v_keyf = ctx.new_var("ord_keyf")
     v_ordersort = ctx.new_var("ordersort")
@@ -28,6 +36,9 @@ class PyOrderByBottomTranslator(OrderByBottomTranslator, PyTranslator):
     self.child_translator.produce(ctx)
 
   def consume(self, ctx):
+    """
+    Actually populate buffer with copies of input rows
+    """
     v_in = ctx['row']
     ctx.pop_vars()
 
@@ -41,6 +52,10 @@ class PyOrderByBottomTranslator(OrderByBottomTranslator, PyTranslator):
 class PyOrderByTopTranslator(OrderByTopTranslator, PyTranslator):
 
   def produce(self, ctx):
+    """
+    This is a pass-through producer.  
+    Mainly handles lineage setup and cleanup
+    """
     if self.l_capture:
       ctx.add_line("# {op}", op=self.op)
       size = "len(%s)" % self.bottom.v_rows
@@ -57,6 +72,10 @@ class PyOrderByTopTranslator(OrderByTopTranslator, PyTranslator):
 
 
   def consume(self, ctx):
+    """
+    Sort buffered rows using special key function, then
+    emit rows in sorted order.  
+    """
     v_irow = ctx.new_var("ord_irow")
     l_i = ctx.new_var("ord_l_i")
 

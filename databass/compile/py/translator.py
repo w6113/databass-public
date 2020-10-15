@@ -193,12 +193,12 @@ class PyTranslator(Translator):
     return str(e)
 
   def attr(self, ctx, e, v_in):
-    v_out = ctx.new_var("e_attr_out")
-    ctx.set(v_out, "{tup}[{idx}]", tup=v_in, idx=e.idx)
-    return v_out
+    # A3: implement me
+    raise Exception("Not Implemented")
 
   def attr_inline(self, ctx, e, v_in):
-    return "{tup}[{idx}]".format(tup=v_in, idx=e.idx)
+    # A3: implement me
+    raise Exception("Not Implemented")
 
 
 class PyRightTranslator(RightTranslator, PyTranslator):
