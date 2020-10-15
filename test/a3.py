@@ -95,10 +95,27 @@ gb_qs = [
 ]
 
 
-
-@pytest.mark.parametrize("q", exprs + hashjoin_qs + gb_qs)
+@pytest.mark.parametrize("q", exprs)
 @pytest.mark.usefixtures("context")
 def test_expr(context, q):
+  compiled_q = PyCompiledQuery(q)
+  rows1 = [tup.row for tup in compiled_q(context['db'])]
+  rows2 = run_sqlite_query(context, q)
+  compare_results(context, rows1, rows2, False)
+
+
+@pytest.mark.parametrize("q", hashjoin_qs)
+@pytest.mark.usefixtures("context")
+def test_hashjoin(context, q):
+  compiled_q = PyCompiledQuery(q)
+  rows1 = [tup.row for tup in compiled_q(context['db'])]
+  rows2 = run_sqlite_query(context, q)
+  compare_results(context, rows1, rows2, False)
+
+
+@pytest.mark.parametrize("q", gb_qs)
+@pytest.mark.usefixtures("context")
+def test_groupby(context, q):
   compiled_q = PyCompiledQuery(q)
   rows1 = [tup.row for tup in compiled_q(context['db'])]
   rows2 = run_sqlite_query(context, q)
