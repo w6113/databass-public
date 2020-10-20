@@ -56,7 +56,7 @@ if __name__ == "__main__":
     """
     @return list of (n, query) pairs, where n is the degree of fusion
     """
-    # A5: implement workload generator to generate less biased
+    # A4: implement workload generator to generate less biased
     #       operator fusion predicates that do not change the query selectivity
     return []
 
@@ -72,16 +72,16 @@ if __name__ == "__main__":
 
 
   #
-  # The following is for A5
+  # The following is for A4
   #
 
   def custom_workload(ns=range(1, 11)):
     """
-    A5: Fill this in to construct your custom workload for A5
+    A4: Fill this in to construct your custom workload for A4
     """
     return []
 
   data = run_benchmark(custom_workload, db)
-  # A5: REPLACE the x axis label text
+  # A4: REPLACE the x axis label text
   plot(data, "FILL IN X AXIS LABEL", "Query Latency (s)", "custom_workload.png")
 
