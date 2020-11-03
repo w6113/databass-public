@@ -113,10 +113,24 @@ class PyTranslator(Translator):
     """
     v_out = ctx.new_var("e_bi_out")
 
-    # A3: implement me
-    #     make sure to support unary and binary expressions
-    #     a unary expression is when e.r is None
-    raise Exception("Not Implemented")
+    v_l = ctx.new_var("expr")
+    v_r = ctx.new_var("expr")
+    op = e.op
+    if op == "=":
+      op = "=="
+    elif op == "<>":
+      op = "!="
+
+    v_l = self.compile_expr(ctx, e.l, v_in)
+    if e.r:
+      v_r = self.compile_expr(ctx, e.r, v_in)
+
+    # write expression result to output variable
+    if e.r:
+      ctx.set(v_out, "({l}) {op} ({r})", l=v_l, op=op, r=v_r)
+    else:
+      ctx.set(v_out, "{op}({l})", op=op, l=v_l)
+
     return v_out
 
   def expr_inline(self, ctx, e, v_in):
@@ -124,8 +138,17 @@ class PyTranslator(Translator):
     @return inlined compiled expression
     """
 
-    # A3: implement me
-    raise Exception("Not Implemented")
+    op = e.op
+    if op == "=":
+      op = "=="
+    elif op == "<>":
+      op = "!="
+    l = self.compile_expr_inline(ctx, e.l, v_in)
+
+    if e.r:
+      r = self.compile_expr_inline(ctx, e.r, v_in)
+      return "(%s) %s (%s)" % (l, op, r)
+    return "%s(%s)" % (op, l)
 
   def paren(self, ctx, e, v_in):
     return self.compile_expr(ctx, e.c, v_in)
@@ -193,12 +216,12 @@ class PyTranslator(Translator):
     return str(e)
 
   def attr(self, ctx, e, v_in):
-    # A3: implement me
-    raise Exception("Not Implemented")
+    v_out = ctx.new_var("e_attr_out")
+    ctx.set(v_out, "{tup}[{idx}]", tup=v_in, idx=e.idx)
+    return v_out
 
   def attr_inline(self, ctx, e, v_in):
-    # A3: implement me
-    raise Exception("Not Implemented")
+    return "{tup}[{idx}]".format(tup=v_in, idx=e.idx)
 
 
 class PyRightTranslator(RightTranslator, PyTranslator):
