@@ -87,7 +87,7 @@ grammar = Grammar(
                "<=" / ">=" / "<" / ">" / "and" / 
                "AND" / "or" / "OR" / "like" / "LIKE" 
     binaryop_no_andor = "+" / "-" / "*" / "/" / "==" / "=" / "<>" / "!=" / 
-               "<=" / ">=" / "<" / ">" / "or " / "OR " / "like " / "LIKE " 
+               "<=" / ">=" / "<" / ">" / "or" / "OR" / "like" / "LIKE" 
     unaryop  = "+" / "-" / "not" / "NOT"
     ws       = ~"\s*"i
     wsp      = ~"\s+"i

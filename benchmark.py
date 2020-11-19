@@ -56,9 +56,10 @@ if __name__ == "__main__":
     """
     @return list of (n, query) pairs, where n is the degree of fusion
     """
-    # A4: implement workload generator to generate less biased
-    #       operator fusion predicates that do not change the query selectivity
-    return []
+    for n_preds in ns:
+      qual = " AND ".join(["a > 0" for j in range(n_preds)])
+      q = "SELECT 1 FROM data4 WHERE %s" % qual
+      yield (n_preds, q)
 
 
 
